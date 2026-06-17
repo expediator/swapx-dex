@@ -1,0 +1,121 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: #0a0b10;
+  color: #e5e7eb;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #0f1117; }
+::-webkit-scrollbar-thumb { background: #1e2235; border-radius: 4px; }
+
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+/* Glow effects */
+.glow-blue  { box-shadow: 0 0 20px rgba(59,130,246,.25); }
+.glow-green { box-shadow: 0 0 20px rgba(34,197,94,.25); }
+.glow-red   { box-shadow: 0 0 20px rgba(239,68,68,.25); }
+
+/* Glass panel */
+.glass {
+  background: rgba(15,17,23,.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid #1e2235;
+}
+
+/* Ticker */
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-wrap { overflow: hidden; }
+.ticker-inner { display: flex; animation: ticker 40s linear infinite; white-space: nowrap; }
+.ticker-inner:hover { animation-play-state: paused; }
+
+/* Tab active indicator */
+.tab-active {
+  background: rgba(59,130,246,.12);
+  color: #60a5fa;
+  border-bottom: 2px solid #3b82f6;
+}
+
+/* Input */
+.input-dark {
+  background: #0a0b10;
+  border: 1px solid #1e2235;
+  color: #e5e7eb;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  transition: border-color .15s;
+  width: 100%;
+}
+.input-dark:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+/* Button */
+.btn-buy {
+  background: #16a34a;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  border: none;
+  transition: background .15s;
+  width: 100%;
+}
+.btn-buy:hover { background: #15803d; }
+
+.btn-sell {
+  background: #dc2626;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  border: none;
+  transition: background .15s;
+  width: 100%;
+}
+.btn-sell:hover { background: #b91c1c; }
+
+.btn-swap {
+  background: #3b82f6;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 12px 20px;
+  cursor: pointer;
+  border: none;
+  transition: background .15s;
+  width: 100%;
+}
+.btn-swap:hover { background: #2563eb; }
+
+/* Price change badges */
+.up   { color: #22c55e; }
+.down { color: #ef4444; }
+
+/* Skeleton loader */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #1e2235 25%, #252a3a 50%, #1e2235 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+}

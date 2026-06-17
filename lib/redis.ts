@@ -1,0 +1,58 @@
+import { Redis } from '@upstash/redis';
+
+// Singleton Redis client
+export const redis = new Redis({
+  url:   process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+
+// ── Key helpers ───────────────────────────────────────────────────
+export const keys = {
+  portfolio:   (uid: string) => `user:${uid}:portfolio`,
+  orders:      (uid: string) => `user:${uid}:orders`,
+  swaps:       (uid: string) => `user:${uid}:swaps`,
+  priceCache:  () => 'prices:cache',
+  priceTs:     () => 'prices:ts',
+};
+
+// ── Portfolio helpers ─────────────────────────────────────────────
+export async function getPortfolio(uid: string): Promise<Record<string, number>> {
+  const raw = await redis.hgetall(keys.portfolio(uid));
+  if (!raw || Object.keys(raw).length === 0) return {};
+  return Object.fromEntries(
+    Object.entries(raw).map(([k, v]) => [k, parseFloat(v as string)])
+  );
+}
+
+export async function setBalance(uid: string, symbol: string, amount: number) {
+  if (amount < 0) amount = 0;
+  if (amount === 0) {
+    await redis.hdel(keys.portfolio(uid), symbol);
+  } else {
+    await redis.hset(keys.portfolio(uid), { [symbol]: amount.toString() });
+  }
+}
+
+// ── Transaction log helpers ────────────────────────────────────────
+export interface TxRecord {
+  id:        string;
+  type:      'swap' | 'buy' | 'sell';
+  fromSym:   string;
+  toSym:     string;
+  fromAmt:   number;
+  toAmt:     number;
+  price:     number;
+  fee:       number;
+  ts:        number;
+}
+
+export async function logTx(uid: string, tx: TxRecord) {
+  const key = keys.swaps(uid);
+  await redis.lpush(key, JSON.stringify(tx));
+  await redis.ltrim(key, 0, 99); // keep last 100 transactions
+}
+
+export async function getTxHistory(uid: string): Promise<TxRecord[]> {
+  const raw = await redis.lrange(keys.swaps(uid), 0, 49);
+  return raw.map(r => JSON.parse(r as string)) as TxRecord[];
+}
