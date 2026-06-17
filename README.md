@@ -2,7 +2,7 @@
 
 > A full-stack simulated crypto exchange combining a **Centralized Exchange (CEX)** order interface with a **Decentralized Exchange (DEX)** AMM swap engine. Built with Next.js 14, TypeScript, Redis, and Google OAuth.
 
-**Live Demo:** [swapx-dex.onrender.com](https://swapx-dex.onrender.com) &nbsp;·&nbsp; **Source:** [github.com/expediator/swapx-dex](https://github.com/expediator/swapx-dex) &nbsp;·&nbsp; **Portfolio:** [expediator.github.io/resume](https://expediator.github.io/resume/)
+**Live Demo:** [easygoing-motivation-production.up.railway.app](https://easygoing-motivation-production.up.railway.app) &nbsp;·&nbsp; **Source:** [github.com/expediator/swapx-dex](https://github.com/expediator/swapx-dex) &nbsp;·&nbsp; **Portfolio:** [expediator.github.io/resume](https://expediator.github.io/resume/)
 
 ---
 
@@ -639,17 +639,17 @@ Render.com offers a free web service tier that runs Node.js apps. Cold starts ta
 GOOGLE_CLIENT_ID         = your_client_id
 GOOGLE_CLIENT_SECRET     = your_client_secret
 NEXTAUTH_SECRET          = your_secret
-NEXTAUTH_URL             = https://swapx-dex.onrender.com   ← your Render URL
+NEXTAUTH_URL             = https://easygoing-motivation-production.up.railway.app   ← your Render URL
 UPSTASH_REDIS_REST_URL   = https://your-db.upstash.io
 UPSTASH_REDIS_REST_TOKEN = your_upstash_token
 ```
 
-> ⚠️ **Important:** `NEXTAUTH_URL` must be your actual Render URL (`https://swapx-dex.onrender.com`). Get it from Render dashboard after first deploy.
+> ⚠️ **Important:** `NEXTAUTH_URL` must be your actual Render URL (`https://easygoing-motivation-production.up.railway.app`). Get it from Render dashboard after first deploy.
 
 **5. Update Google OAuth redirect URI:**
 - Go back to Google Cloud Console → Credentials
 - Edit your OAuth client
-- Add: `https://swapx-dex.onrender.com/api/auth/callback/google`
+- Add: `https://easygoing-motivation-production.up.railway.app/api/auth/callback/google`
 - Save
 
 **6. Redeploy** (Render does this automatically on every push to main).
@@ -668,7 +668,7 @@ UPSTASH_REDIS_REST_TOKEN = your_upstash_token
 | `GOOGLE_CLIENT_ID` | ✅ Yes | Google Cloud Console → Credentials | `123456-abc.apps.googleusercontent.com` |
 | `GOOGLE_CLIENT_SECRET` | ✅ Yes | Same as above | `GOCSPX-abcdef123456` |
 | `NEXTAUTH_SECRET` | ✅ Yes | Generate randomly | `Kj3mN9pQ2rS8tU5vW1xY4zA6bC7dE0fG` |
-| `NEXTAUTH_URL` | ✅ Yes | Your app's public URL | `https://swapx-dex.onrender.com` |
+| `NEXTAUTH_URL` | ✅ Yes | Your app's public URL | `https://easygoing-motivation-production.up.railway.app` |
 | `UPSTASH_REDIS_REST_URL` | ✅ Yes | Upstash console → REST API | `https://notable-ox-12345.upstash.io` |
 | `UPSTASH_REDIS_REST_TOKEN` | ✅ Yes | Same Upstash database | `AXxxxxxxxxxxxxxx==` |
 
