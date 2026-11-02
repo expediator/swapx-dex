@@ -93,7 +93,7 @@ export function LandingClient({ tickerTokens }: { tickerTokens: TickerToken[] })
       </section>
 
       <footer className="border-t border-[#1e2235] px-8 py-4 flex items-center justify-between text-xs text-[#4b5563]">
-        <span>© 2026 SwapX · <a href="https://expediator.github.io/resume/" className="text-blue-400 hover:underline">expediator</a></span>
+        <span>© {new Date().getFullYear()} SwapX™ · <a href="https://expediator.github.io/resume/" className="text-blue-400 hover:underline">Expediator Inc.</a></span>
         <span>Demo — not financial advice</span>
       </footer>
     </div>
