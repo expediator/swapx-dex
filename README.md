@@ -4,7 +4,7 @@
 
 **Full-stack CEX + DEX crypto trading platform**
 
-[![Live](https://img.shields.io/badge/Live-Railway-0B0D0E?style=flat-square&logo=railway&logoColor=white)](https://easygoing-motivation-production.up.railway.app)
+[![Live](https://img.shields.io/badge/Live-Vercel-000000?style=flat-square&logo=vercel&logoColor=white)](https://swapx-dex.vercel.app)
 [![GitHub](https://img.shields.io/badge/GitHub-expediator%2Fswapx--dex-181717?style=flat-square&logo=github)](https://github.com/expediator/swapx-dex)
 [![Next.js](https://img.shields.io/badge/Next.js_14-000000?style=flat-square&logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
@@ -23,8 +23,28 @@ A portfolio/educational project demonstrating full-stack web development using a
 - **30+ Tokens** — BTC, ETH, SOL, DeFi tokens, stablecoins, meme coins.
 - **Persistent Portfolios** — Per-user portfolios stored in Upstash Redis. Survive refreshes and sessions.
 - **Full Transaction History** — Every trade logged, last 100 per user.
+- **$100,000 Trading Challenge** — Every user starts with $100k USDT and has 60 days to reach 7.5% return to qualify for live trading.
+- **Performance Chart** — 4-line Recharts LineChart (baseline/target/max-loss/actual). Real-time 30s auto-refresh.
+- **Username + Avatar Onboarding** — 12 emoji avatars, custom username; onboarding gated on first login.
+- **KYC Gate** — Identity verification flow triggered when challenge target is hit.
 - **Google OAuth** — One-click sign in, no wallet required.
 - **Real-time Prices** — CoinGecko v3 API with Redis caching to avoid rate limits.
+
+---
+
+## 🆙 Update 1 — November 2026
+
+> **$100k Trading Challenge System**
+
+| What | Detail |
+|------|--------|
+| Starting balance | $100,000 USDT per new user (was ~$17k mixed portfolio) |
+| Challenge target | $107,500 (7.5% return in 60 days) |
+| Safety floor | $70,000 (30% drawdown triggers warning) |
+| Performance chart | 4-line Recharts chart — baseline (grey), target (green), max loss (red), actual (purple) — refreshes every 30s |
+| Onboarding | /onboarding page: pick username + 1 of 12 emoji avatars |
+| KYC gate | Modal + /kyc page shown when target is reached |
+| Portfolio snapshots | Saved to Redis after every trade for chart history |
 
 ## Tech Stack
 
