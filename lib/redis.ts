@@ -1,9 +1,21 @@
 import { Redis } from '@upstash/redis';
 
-// Singleton Redis client
-export const redis = new Redis({
-  url:   process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+// Lazy singleton — throws at call time (not import time) if env vars missing
+let _redis: Redis | null = null;
+function getClient(): Redis {
+  if (!_redis) {
+    const url   = process.env.UPSTASH_REDIS_REST_URL;
+    const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+    if (!url || !token) throw new Error('UPSTASH_REDIS_REST_URL / TOKEN not set');
+    _redis = new Redis({ url, token });
+  }
+  return _redis;
+}
+
+export const redis = new Proxy({} as Redis, {
+  get(_, prop: string) {
+    return (...args: unknown[]) => (getClient() as unknown as Record<string, (...a: unknown[]) => unknown>)[prop](...args);
+  },
 });
 
 // ── Key helpers ───────────────────────────────────────────────────
