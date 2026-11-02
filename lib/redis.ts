@@ -67,9 +67,14 @@ export async function logTx(uid: string, tx: TxRecord) {
   await redis.ltrim(key, 0, 99); // keep last 100 transactions
 }
 
+function parseVal<T>(r: unknown): T {
+  if (typeof r === 'string') return JSON.parse(r) as T;
+  return r as T;
+}
+
 export async function getTxHistory(uid: string): Promise<TxRecord[]> {
   const raw = await redis.lrange(keys.swaps(uid), 0, 49);
-  return raw.map(r => JSON.parse(r as string)) as TxRecord[];
+  return raw.map(r => parseVal<TxRecord>(r));
 }
 
 // ── Profile helpers ────────────────────────────────────────────────
@@ -103,14 +108,14 @@ export async function saveSnapshot(uid: string, value: number) {
 
 export async function getSnapshots(uid: string): Promise<Snapshot[]> {
   const raw = await redis.lrange(keys.snapshots(uid), 0, 199);
-  return (raw as string[]).map(r => JSON.parse(r) as Snapshot).reverse();
+  return raw.map(r => parseVal<Snapshot>(r)).reverse();
 }
 
 // ── Challenge start ────────────────────────────────────────────────
 export async function getChallengeStart(uid: string): Promise<number | null> {
   const raw = await redis.get(keys.challengeStart(uid));
   if (!raw) return null;
-  return parseInt(raw as string, 10);
+  return typeof raw === 'number' ? raw : parseInt(raw as string, 10);
 }
 
 export async function setChallengeStart(uid: string, ts: number) {
