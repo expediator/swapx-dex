@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { getPortfolio, setBalance, logTx } from '@/lib/redis';
+import { getPortfolio, setBalance, logTx, saveSnapshot } from '@/lib/redis';
 import { getPrices } from '@/lib/prices';
 import { TOKEN_MAP } from '@/lib/tokens';
 import crypto from 'crypto';
@@ -54,6 +54,11 @@ export async function POST(req: NextRequest) {
       ts:      Date.now(),
     }),
   ]);
+
+  // Fire-and-forget portfolio snapshot for performance chart
+  const newPort = { ...portfolio, [fromSym]: fromBal - fromAmt, [toSym]: (portfolio[toSym] ?? 0) + toAmt };
+  const newTotal = Object.entries(newPort).reduce((s, [sym, amt]) => s + (amt as number) * (prices[sym] ?? 1), 0);
+  saveSnapshot(uid, newTotal).catch(() => {});
 
   return NextResponse.json({ success: true, toAmt, fee, rate: fromPrice / toPrice });
 }

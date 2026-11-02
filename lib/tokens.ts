@@ -49,12 +49,7 @@ export const TOKENS: Token[] = [
 export const TOKEN_MAP = Object.fromEntries(TOKENS.map(t => [t.symbol, t]));
 
 export const INITIAL_PORTFOLIO: Record<string, number> = {
-  USDT: 10000,
-  USDC: 5000,
-  ETH:  0.5,
-  BTC:  0.005,
-  SOL:  10,
-  BNB:  1,
+  USDT: 100000,
 };
 
 export const GECKO_IDS = TOKENS.map(t => t.geckoId);

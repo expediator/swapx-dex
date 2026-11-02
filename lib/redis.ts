@@ -20,11 +20,14 @@ export const redis = new Proxy({} as Redis, {
 
 // ── Key helpers ───────────────────────────────────────────────────
 export const keys = {
-  portfolio:   (uid: string) => `user:${uid}:portfolio`,
-  orders:      (uid: string) => `user:${uid}:orders`,
-  swaps:       (uid: string) => `user:${uid}:swaps`,
-  priceCache:  () => 'prices:cache',
-  priceTs:     () => 'prices:ts',
+  portfolio:      (uid: string) => `user:${uid}:portfolio`,
+  orders:         (uid: string) => `user:${uid}:orders`,
+  swaps:          (uid: string) => `user:${uid}:swaps`,
+  profile:        (uid: string) => `user:${uid}:profile`,
+  snapshots:      (uid: string) => `user:${uid}:snapshots`,
+  challengeStart: (uid: string) => `user:${uid}:challengeStart`,
+  priceCache:     () => 'prices:cache',
+  priceTs:        () => 'prices:ts',
 };
 
 // ── Portfolio helpers ─────────────────────────────────────────────
@@ -67,4 +70,49 @@ export async function logTx(uid: string, tx: TxRecord) {
 export async function getTxHistory(uid: string): Promise<TxRecord[]> {
   const raw = await redis.lrange(keys.swaps(uid), 0, 49);
   return raw.map(r => JSON.parse(r as string)) as TxRecord[];
+}
+
+// ── Profile helpers ────────────────────────────────────────────────
+export interface UserProfile {
+  username:  string;
+  avatarId:  number;
+  setupDone: boolean;
+}
+
+export async function getProfile(uid: string): Promise<UserProfile | null> {
+  const raw = await redis.get(keys.profile(uid));
+  if (!raw) return null;
+  return typeof raw === 'string' ? JSON.parse(raw) : (raw as UserProfile);
+}
+
+export async function setProfile(uid: string, profile: UserProfile) {
+  await redis.set(keys.profile(uid), JSON.stringify(profile));
+}
+
+// ── Snapshot helpers ───────────────────────────────────────────────
+export interface Snapshot {
+  ts:    number;
+  value: number;
+}
+
+export async function saveSnapshot(uid: string, value: number) {
+  const key = keys.snapshots(uid);
+  await redis.lpush(key, JSON.stringify({ ts: Date.now(), value }));
+  await redis.ltrim(key, 0, 199);
+}
+
+export async function getSnapshots(uid: string): Promise<Snapshot[]> {
+  const raw = await redis.lrange(keys.snapshots(uid), 0, 199);
+  return (raw as string[]).map(r => JSON.parse(r) as Snapshot).reverse();
+}
+
+// ── Challenge start ────────────────────────────────────────────────
+export async function getChallengeStart(uid: string): Promise<number | null> {
+  const raw = await redis.get(keys.challengeStart(uid));
+  if (!raw) return null;
+  return parseInt(raw as string, 10);
+}
+
+export async function setChallengeStart(uid: string, ts: number) {
+  await redis.set(keys.challengeStart(uid), ts.toString());
 }

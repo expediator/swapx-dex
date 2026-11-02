@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { getPortfolio, setBalance, logTx } from '@/lib/redis';
+import { getPortfolio, setBalance, logTx, saveSnapshot } from '@/lib/redis';
 import { getPrices } from '@/lib/prices';
 import { TOKEN_MAP } from '@/lib/tokens';
 import crypto from 'crypto';
@@ -38,22 +38,26 @@ export async function POST(req: NextRequest) {
   const quotePrice = prices[quoteSym] ?? 1; // USDT/USDC ≈ 1 USD
 
   if (side === 'buy') {
-    // Spend quoteSym to receive baseSym
-    const spendUsd   = amount; // amount is in quote token
+    const spendUsd   = amount;
     const quoteBal   = portfolio[quoteSym] ?? 0;
     const spendQuote = spendUsd / quotePrice;
     if (quoteBal < spendQuote)
       return NextResponse.json({ error: `Insufficient ${quoteSym}` }, { status: 400 });
-    const fee       = spendUsd * FEE_RATE;
-    const baseAmt   = (spendUsd - fee) / execPrice;
+    const fee     = spendUsd * FEE_RATE;
+    const baseAmt = (spendUsd - fee) / execPrice;
     await Promise.all([
       setBalance(uid, quoteSym, quoteBal - spendQuote),
       setBalance(uid, baseSym, (portfolio[baseSym] ?? 0) + baseAmt),
       logTx(uid, { id: crypto.randomUUID(), type: 'buy', fromSym: quoteSym, toSym: baseSym, fromAmt: spendQuote, toAmt: baseAmt, price: execPrice, fee, ts: Date.now() }),
     ]);
+
+    // Snapshot
+    const newPort = { ...portfolio, [quoteSym]: quoteBal - spendQuote, [baseSym]: (portfolio[baseSym] ?? 0) + baseAmt };
+    const newTotal = Object.entries(newPort).reduce((s, [sym, amt]) => s + (amt as number) * (prices[sym] ?? 1), 0);
+    saveSnapshot(uid, newTotal).catch(() => {});
+
     return NextResponse.json({ success: true, baseAmt, fee, execPrice });
   } else {
-    // Sell baseSym for quoteSym
     const sellAmt  = amount;
     const baseBal  = portfolio[baseSym] ?? 0;
     if (baseBal < sellAmt)
@@ -67,6 +71,12 @@ export async function POST(req: NextRequest) {
       setBalance(uid, quoteSym, (portfolio[quoteSym] ?? 0) + quoteAmt),
       logTx(uid, { id: crypto.randomUUID(), type: 'sell', fromSym: baseSym, toSym: quoteSym, fromAmt: sellAmt, toAmt: quoteAmt, price: execPrice, fee, ts: Date.now() }),
     ]);
+
+    // Snapshot
+    const newPort = { ...portfolio, [baseSym]: baseBal - sellAmt, [quoteSym]: (portfolio[quoteSym] ?? 0) + quoteAmt };
+    const newTotal = Object.entries(newPort).reduce((s, [sym, amt]) => s + (amt as number) * (prices[sym] ?? 1), 0);
+    saveSnapshot(uid, newTotal).catch(() => {});
+
     return NextResponse.json({ success: true, quoteAmt, fee, execPrice });
   }
 }
